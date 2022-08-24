@@ -316,7 +316,9 @@ export function fetchEvents(route) {
       events: driveEvents,
     });
     resolveEvents(driveEvents);
-    setCacheItem('events', route.fullname, parseInt(Date.now()/1000) + (86400*14), driveEvents, route.maxqlog);
+    if (!USE_LOCAL_EVENTS_DATA) {
+      setCacheItem('events', route.fullname, parseInt(Date.now()/1000) + (86400*14), driveEvents, route.maxqlog);
+    }
   }
 }
 
@@ -478,6 +480,8 @@ export function fetchDriveCoords(route) {
       driveCoords,
     });
     resolveDriveCoords(driveCoords);
-    setCacheItem('driveCoords', route.fullname, parseInt(Date.now()/1000) + (86400*14), driveCoords, route.maxqlog);
+    if (!USE_LOCAL_COORDS_DATA) {
+      setCacheItem('driveCoords', route.fullname, parseInt(Date.now()/1000) + (86400*14), driveCoords, route.maxqlog);
+    }
   }
 }
