@@ -3,6 +3,8 @@ import * as Sentry from '@sentry/react';
 import * as Types from './types';
 import GeocodeApi from '../api/geocode';
 
+const USE_LOCAL_CHFFR_DATA = !!process.env.REACT_APP_LOCAL_CHFFR_DATA;
+
 const eventsRequests = {};
 const coordsRequests = {};
 const driveCoordsRequests = {};
@@ -283,7 +285,11 @@ export function fetchEvents(route) {
     const promises = [];
     for (let i = 0; i <= route.maxqlog; i++) {
       promises.push((async (i) => {
-        const resp = await fetch(`${route.url}/${i}/events.json`, { method: 'GET' });
+        const url = new URL(`${route.url}/${i}/events.json`);
+        if (USE_LOCAL_CHFFR_DATA) {
+          url.hostname = 'chffrprivate.azureedge.local';
+        }
+        const resp = await fetch(url, { method: 'GET' });
         if (!resp.ok) {
           return [];
         }
