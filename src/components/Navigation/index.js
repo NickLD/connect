@@ -322,6 +322,7 @@ class Navigation extends Component {
     this.updateFavoriteLocations = this.updateFavoriteLocations.bind(this);
     this.getFavoriteLabelIcon = this.getFavoriteLabelIcon.bind(this);
     this.formatDistance = this.formatDistance.bind(this);
+    this.formatRouteDistance = this.formatRouteDistance.bind(this);
     this.formatDuration = this.formatDuration.bind(this);
     this.navigate = this.navigate.bind(this);
     this.onResize = this.onResize.bind(this);
@@ -745,9 +746,14 @@ class Navigation extends Component {
     }
   }
 
-  formatDistance(route) {
-    const meters = route.distance;
+  formatDistance(meters, metric) {
+    if (metric) {
+      return (meters / 1000.0).toFixed(1) + " km";
+    }
+    return (meters / 1609.34).toFixed(1) + " mi";
+  }
 
+  formatRouteDistance(route) {
     let metric = true;
     try {
       route.legs[0].admins.forEach((adm) => {
@@ -759,10 +765,7 @@ class Navigation extends Component {
       metric = false;
     }
 
-    if (metric) {
-      return (meters / 1000.0).toFixed(1) + " km";
-    }
-    return (meters / 1609.34).toFixed(1) + " mi";
+    return this.formatDistance(route.distance, metric);
   }
 
   formatDuration(route) {
@@ -1148,7 +1151,7 @@ class Navigation extends Component {
             <Typography className={ classes.bold }>{ this.formatSearchName(searchSelect) }</Typography>
             { searchSelect.route &&
               <Typography className={ classes.searchSelectBoxDetails }>
-                { this.formatDistance(searchSelect.route) } (
+                { this.formatRouteDistance(searchSelect.route) } (
                 { this.formatDuration(searchSelect.route) })
               </Typography>
             }
