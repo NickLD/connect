@@ -329,6 +329,7 @@ class Navigation extends Component {
     this.toggleCarPinTooltip = this.toggleCarPinTooltip.bind(this);
     this.clearSearch = this.clearSearch.bind(this);
     this.formatSearchName = this.formatSearchName.bind(this);
+    this.formatSearchAddress = this.formatSearchAddress.bind(this);
     this.formatSearchDetails = this.formatSearchDetails.bind(this);
     this.itemLoc = this.itemLoc.bind(this);
     this.itemLngLat = this.itemLngLat.bind(this);
@@ -788,17 +789,20 @@ class Navigation extends Component {
     }
   }
 
-  formatSearchDetails(item, comma=false) {
-    const name = this.formatSearchName(item);
-    const addrLabelName = item.address.label.split(',', 1)[0];
-    let res;
-    if (name.substr(0, addrLabelName.length) === addrLabelName) {
-      res = item.address.label.split(', ').slice(1).join(', ');
-    } else {
-      res = item.address.label;
+  formatSearchAddress(item, state=true) {
+    const { houseNumber, street, city } = item.address;
+    let res = houseNumber ? `${houseNumber} ${street}, ${city}`.trimStart() : `${street}, ${city}`;
+    if (state) {
+      const { stateCode, postalCode } = item.address;
+      res += `, ${stateCode} ${postalCode}`;
     }
-    if (res.length) {
-      return (comma ? ', ' : '') + res;
+    return res;
+  }
+
+  formatSearchDetails(item) {
+    const address = this.formatSearchAddress(item, false);
+    if (address.length) {
+      return `, ${address} (${this.formatDistance(item.distance)})`;
     }
   }
 
@@ -835,7 +839,7 @@ class Navigation extends Component {
 
     const pos = this.itemLoc(searchSelect);
     NavigationAPI.setDestination(dongleId, pos.lat, pos.lng,
-      this.formatSearchName(searchSelect), this.formatSearchDetails(searchSelect))
+      this.formatSearchName(searchSelect), this.formatSearchAddress(searchSelect))
     .then((resp) => {
       if (resp.error) {
         throw new Error(resp.error);
@@ -877,7 +881,7 @@ class Navigation extends Component {
     const pos = this.itemLoc(searchSelect);
     const label = as === 'pin' ? undefined : as;
     NavigationAPI.putLocationSave(dongleId, pos.lat, pos.lng,
-      this.formatSearchName(searchSelect), this.formatSearchDetails(searchSelect), 'favorite', label)
+      this.formatSearchName(searchSelect), this.formatSearchAddress(searchSelect), 'favorite', label)
     .then((resp) => {
       this.updateFavoriteLocations();
       this.setState({
@@ -1204,7 +1208,7 @@ class Navigation extends Component {
           </div>
         </div>
         <Typography className={ classes.searchSelectBoxDetails }>
-          { this.formatSearchDetails(searchSelect, false) }
+          { this.formatSearchAddress(searchSelect) }
         </Typography>
       </div>
     );
