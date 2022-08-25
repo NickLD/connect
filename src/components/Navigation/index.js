@@ -789,7 +789,7 @@ class Navigation extends Component {
     }
   }
 
-  formatSearchAddress(item, state=true) {
+  formatSearchAddress(item, state = true) {
     const { houseNumber, street, city } = item.address;
     let res = houseNumber ? `${houseNumber} ${street}, ${city}`.trimStart() : `${street}, ${city}`;
     if (state) {
@@ -804,6 +804,7 @@ class Navigation extends Component {
     if (address.length) {
       return `, ${address} (${this.formatDistance(item.distance)})`;
     }
+    return undefined;
   }
 
   itemLoc(item) {
@@ -1129,7 +1130,7 @@ class Navigation extends Component {
                 <Typography>
                   { this.formatSearchName(item) }
                   <span className={ classes.overlaySearchDetails }>
-                    { this.formatSearchDetails(item, true) }
+                    { this.formatSearchDetails(item) }
                   </span>
                 </Typography>
               </div>
